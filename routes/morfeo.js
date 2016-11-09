@@ -1,7 +1,8 @@
 var express = require('express');
-var config = require('../config');
-var dirToJson = require('dir-to-json');
 var fs = require("fs");
+var path = require('path');
+var dirToJson = require('dir-to-json');
+var config = require('../config');
 
 var router = express.Router();
 
@@ -17,11 +18,10 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/file', function(req, res, next) {
-  var filename = req.query.filename;
-  var stat = fs.statSync( filename );
-  res.writeHeader(200, { "Content-Length" : stat.size } );
-  var fReadStream = fs.createReadStream( filename );
-  fReadStream.pipe( res );
+  var filename = path.join( config.morfeo.path, req.query.filename);
+  console.log('Starting download: ' + filename);
+  var stream = fs.createReadStream(filename, { bufferSize: 64 * 1024 });
+  stream.pipe( res );
 });
 
 module.exports = router;
